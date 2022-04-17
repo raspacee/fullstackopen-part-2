@@ -6,6 +6,7 @@ function App() {
   const [query, setQuery] = useState('');
   const [filteredCountries, setFilteredCountries] = useState([]);
   const [highlightedCountry, setHighlightedCountry] = useState({});
+  const [weather, setWeather] = useState({});
 
   useEffect(() => {
     axios
@@ -15,6 +16,14 @@ function App() {
       })
   }, [])
 
+  const getWeather = (country) => {
+    axios
+      .get(`https://api.openweathermap.org/data/2.5/weather?lat=${country.capitalInfo.latlng[0]}&lon=${country.capitalInfo.latlng[1]}&appid=${process.env.REACT_APP_API_KEY}`)
+      .then(response => {
+        setWeather(response.data);
+      })
+  }
+
   const handleQueryChange = (e) => {
     setQuery(e.target.value);
 
@@ -22,7 +31,7 @@ function App() {
     if (filtered.length > 10) {
       setFilteredCountries([]);
     } else if (filtered.length === 1) {
-      setHighlightedCountry(filtered[0]);
+      handleShow(filtered[0])
     } else {
       setFilteredCountries(filtered);
     }
@@ -30,6 +39,7 @@ function App() {
 
   const handleShow = (country) => {
     setHighlightedCountry(country)
+    getWeather(country);
   }
 
   return (
@@ -48,8 +58,17 @@ function App() {
             <ul>
               {Object.values(highlightedCountry.languages).map(l => <li key={l}>{l}</li>)}
             </ul>
+
           </div>
         : <></>
+        }
+        { Object.keys(weather).length != 0
+          ? <div>
+            <h1>Weather in {weather.name}</h1>
+            <p>temperature {weather.main.temp} celsius</p>
+            <p>wind {weather.wind.speed} m/s</p>
+            </div>
+          : <></>
         }
     </div>
   );
