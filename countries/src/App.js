@@ -5,12 +5,12 @@ function App() {
   const [countries, setCountries] = useState([]);
   const [query, setQuery] = useState('');
   const [filteredCountries, setFilteredCountries] = useState([]);
+  const [highlightedCountry, setHighlightedCountry] = useState({});
 
   useEffect(() => {
     axios
       .get('https://restcountries.com/v3.1/all')
       .then(response => {
-        console.log(response.data)
         setCountries(response.data);
       })
   }, [])
@@ -21,9 +21,15 @@ function App() {
     const filtered = countries.filter(country => country.name.common.toLowerCase().includes(e.target.value));
     if (filtered.length > 10) {
       setFilteredCountries([]);
+    } else if (filtered.length === 1) {
+      setHighlightedCountry(filtered[0]);
     } else {
       setFilteredCountries(filtered);
     }
+  }
+
+  const handleShow = (country) => {
+    setHighlightedCountry(country)
   }
 
   return (
@@ -31,23 +37,20 @@ function App() {
       <label>find countries</label><input onChange={handleQueryChange} value={query}/>
       <ul>
         {filteredCountries.length > 0
-          ? filteredCountries.map(country => <li key={country.name.common}>{country.name.common}</li>)
+          ? filteredCountries.map(country => <li key={country.name.common}>{country.name.common} <button onClick={() => handleShow(country)}>show</button></li>)
           : <li>Too many matches, specify another filter</li>}
       </ul>
-      {filteredCountries.length === 1
-        ? filteredCountries.map(country => {
-          return (
-            <div>
-              <h1>{country.name.common}</h1>
-              <p>capital {country.capital}</p>
-              <p>area {country.area}</p>
-              <ul>
-                {Object.values(country.languages).map(l => <li>{l}</li>)}
-              </ul>
-            </div>
-          )
-        })
-        : <></>}
+        { Object.keys(highlightedCountry).length != 0
+        ? <div>
+            <h1>{highlightedCountry.name.common}</h1>
+            <p>capital {highlightedCountry.capital}</p>
+            <p>area {highlightedCountry.area}</p>
+            <ul>
+              {Object.values(highlightedCountry.languages).map(l => <li key={l}>{l}</li>)}
+            </ul>
+          </div>
+        : <></>
+        }
     </div>
   );
 }
