@@ -3,6 +3,7 @@ import axios from 'axios'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
+import { create } from './services/numbers'
 
 const App = () => {
   const [persons, setPersons] = useState([])
@@ -24,9 +25,19 @@ const App = () => {
       alert(`${newName} is already added to the phonebook`);
     } else {
       let tmp_persons = [...persons];
-      tmp_persons.push({ name: newName, number: newNumber });
+      let new_person = { name: newName, number: newNumber };
+      tmp_persons.push(new_person);
       setPersons(tmp_persons);
+
+      create(new_person)
+        .then(data => {
+          console.log(data)
+        })
+        .catch(error => {
+          alert('error')
+        })
     }
+
     setNewName('');
     setNewNumber('');
   }
