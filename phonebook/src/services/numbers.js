@@ -7,4 +7,9 @@ const create = (newNumber) => {
     return request.then(response => response.data)
 }
 
-export { create }
+const getAll = () => {
+    const request = axios.get(base_url)
+    return request.then(response => response.data)
+}
+
+export { create, getAll }
