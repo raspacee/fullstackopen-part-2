@@ -22,4 +22,4 @@ const updateNumber = (person) => {
     return request.then(response => response.data)
 }
 
-export { create, getAll, deletePerson, updateNumber }
+export default { create, getAll, deletePerson, updateNumber }
