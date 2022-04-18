@@ -3,7 +3,7 @@ import axios from 'axios'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
-import { create, getAll } from './services/numbers'
+import { create, getAll, deletePerson } from './services/numbers'
 
 const App = () => {
   const [persons, setPersons] = useState([])
@@ -25,12 +25,11 @@ const App = () => {
     } else {
       let tmp_persons = [...persons];
       let new_person = { name: newName, number: newNumber };
-      tmp_persons.push(new_person);
-      setPersons(tmp_persons);
 
       create(new_person)
         .then(data => {
-          console.log(data)
+          tmp_persons.push(data);
+          setPersons(tmp_persons);
         })
         .catch(error => {
           alert('error')
@@ -56,6 +55,18 @@ const App = () => {
     setFilter(event.target.value);
   }
 
+  const handleDelete = (id, name) => {
+    if (window.confirm(`Do you really want to delete ${name}?`)) {
+      deletePerson(id)
+        .then(data => {
+          setPersons(persons.filter(person => person.id !== id))
+        })
+        .catch(error => {
+          alert(error);
+        })
+    }
+  }
+
 
   return (
     <div>
@@ -63,7 +74,7 @@ const App = () => {
       <Filter handleFilterChange={handleFilterChange} filter={filter}/>
       <PersonForm handleNameChange={handleNameChange} handleNumberChange={handleNumberChange} newName={newName}
         newNumber={newNumber} handleSubmit={handleSubmit}/>
-      <Persons filter={filter} persons={persons}/>
+      <Persons handleDelete={handleDelete} filter={filter} persons={persons}/>
     </div>
   )
 }
